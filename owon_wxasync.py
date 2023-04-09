@@ -7,11 +7,6 @@ from bleak.backends.scanner import AdvertisementData
 import time
 import pyttsx3
 
-#ESP32 serial ble
-#MODEL_NBR_UUID="0000181a-0000-1000-8000-00805f9b34fb"
-#HC05
-#MODEL_NBR_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb"
-#CHAR_NBR_UUID = "0000FFE1-0000-1000-8000-00805F9B34FB"
 #OWON 16
 MODEL_NAME="BDM"
 MODEL_ADDR="A6:C0:80:90:2D:DB"
