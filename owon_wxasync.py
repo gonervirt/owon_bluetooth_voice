@@ -19,6 +19,7 @@ def parle (chaine):
 dict = {"25": ("milli Volts",10),
         "35": ("Volts",1000),
         "33": ("Ohm",10),
+        "55": ("Ohm",10),
         "41": ("Kilo Ohm",10),
         "51": ("Mega Ohm",1000),
         "74": ("nanoFarad",10),
@@ -27,7 +28,7 @@ dict = {"25": ("milli Volts",10),
         "96": ("NCV",10),
         "145": ("micro Ampere",10),
         "154": ("milli Ampere",100),
-        "162": ("Hertz",100)}
+        "162": ("Ampere",100)}
 
 
 
