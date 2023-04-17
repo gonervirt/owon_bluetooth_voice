@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+
+"""
+
+   AIDE TECHNIQUE BASSE-VISION POUR ACCES AU MULTIMETRE OWON 16 AVEC NVDA 
+
+ce code crée  une IHM accessible sur un PC pour permettre d'accéder aux mesures fournies par 
+un multimetre  OWON 16 via sa liaison sans fil BLE
+
+ce script a été développé par Sébastien de l'atelier partagé, FABLAB de Betton (France 35830)
+ce projet a été mené en partenariat avec My Human Kit, FABLAB de Rennes.
+
+cet outil est compatible du lecteur d'écran NVDA. 
+
+il donne accès aux mesures du multimetre au moyen de la synthèse vocale.
+
+ce projet est publié en opensource (libre et gratuit) sous licence libre CECIL.
+http://cecill.info/licences/Licence_CeCILL_V1-fr.html 
+
+"""
+
 import wx
 import asyncio
 import wxasync
@@ -16,8 +37,9 @@ def parle (chaine):
     engine.say(chaine)
     engine.runAndWait()
 
-dict = {"25": ("milli Volts",10),
-        "35": ("Volts",1000),
+dict = {"25": ("milli Volts DC",10),
+        "89": ("milli Volts AC",10),
+        "35": ("Volts DC",1000),
         "33": ("Ohm",10),
         "55": ("Ohm",10),
         "41": ("Kilo Ohm",10),
@@ -26,9 +48,12 @@ dict = {"25": ("milli Volts",10),
         "163": ("Hertz",10),
         "32": ("°C",1),
         "96": ("NCV",10),
-        "145": ("micro Ampere",10),
-        "154": ("milli Ampere",100),
-        "162": ("Ampere",100)}
+        "145": ("micro Ampere DC",10),
+        "209": ("micro Ampere AC",10),
+        "154": ("milli Ampere DC",100),
+        "218": ("milli Ampere AC",100),
+        "162": ("Ampère DC",100),
+        "226": ("Ampère AC",100)}
 
 
 
