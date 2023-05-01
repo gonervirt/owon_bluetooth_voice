@@ -33,6 +33,11 @@ MODEL_NAME="BDM"
 MODEL_ADDR="A6:C0:80:90:2D:DB"
 CHAR_NBR_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
 
+status_dict = {"DISCON":"en attente de connexion",
+               "FOUND":"Client trouvé",
+               "CONN":"Connecté, en attente de données",
+    }
+
 def parle (chaine):
     engine.say(chaine)
     engine.runAndWait()
@@ -55,8 +60,8 @@ dict = {"25": ("milli Volts DC",10),
         "162": ("Ampère DC",100),
         "226": ("Ampère AC",100)}
 
-
-
+const_selecteur_decompte=3
+"""
  #Windows closing handler
 def on_close(event):
     #asyncio.create_task(self.ble.disconnect_async())
@@ -65,6 +70,7 @@ def on_close(event):
     print("on close event called")
     for task in asyncio.all_tasks():
         task.cancel()
+"""
 
 class MyFrame(wx.Frame):
     def __init__(self):
@@ -72,6 +78,10 @@ class MyFrame(wx.Frame):
         
         #cree la fenetre au centre de l'ecran
         self.Centre()
+        #status bar
+        self.statusbar=self.CreateStatusBar()
+        #self.statusbar.SetFieldsCount(2,[50,50])
+        self.statusbar.SetStatusText("En attente de connexion",0)
         self.panel = wx.Panel(self)
         
         #couleur et taille
@@ -91,9 +101,82 @@ class MyFrame(wx.Frame):
         #self.sizer.Add(self.text_ctrl, 1, wx.EXPAND)
         self.panel.SetSizer(self.sizer)
         
+         #add binding event
+        self.Bind (wx.EVT_CLOSE, self.on_close)
+        self.Bind (wx.EVT_CHAR_HOOK, self.on_key)
+        
+        #timer
+        self.timer = wx.Timer (self)
+        #timer event each 1000ms
+        self.timer.Start (1000)
+        self.Bind (wx.EVT_TIMER, self.on_timer)
+        
+        self.status="DISCON"
+        self.status_timer=0
+        self.closure_request = False
+        
         self.selecteur = "none"
+        self.selecteur_transitoire = "none"
+        self.selecteur_transitoire_count = const_selecteur_decompte
+        self.value = 0
+        
         
         self.connected=False
+    
+    #waiting for key stroke
+    def on_key (self, event):
+        key = event.GetKeyCode()
+        if key == wx.WXK_RETURN:
+            print ('return')
+        if key == wx.WXK_DELETE:
+            print ('delete')
+        if key == wx.WXK_F10:
+            for task in asyncio.all_tasks():
+                print(task)
+            print ('F10')
+        if key == wx.WXK_F4:
+            parle (status_dict[self.status])
+            print ('F4')
+        if key == wx.WXK_F5:
+            parle (str(self.value)+" "+self.selecteur)
+            
+    #waiting for key stroke
+    def on_timer (self, event):
+        #to to
+        #print(f"on timer   {self.client.is_connected}")
+        #print(f"on timer")
+        #if self.status is "CONN":
+        if self.status == "FOUND":
+            #print (bluetooth_task)
+            #for task in asyncio.all_tasks():
+                #print(task)
+            self.status_timer+=1
+            if self.status_timer > 5:
+                print(f"on timer disconnecting")
+                bluetooth_task.cancel()
+                loop = asyncio.get_event_loop()
+                bluetooth_task=loop.create_task(frame.main_loop(),name="bluetooth")
+                #self.client.disconnect()
+            
+
+
+    
+    #Windows closing handler
+    def on_close(self, event):
+        #asyncio.create_task(self.client.disconnect())
+        #event.Skip()
+        print("on close event called")
+        # si pas connecté, on arret ici
+        if self.status != "CONN":
+            quit(0)
+        self.closure_request = True
+        #debug
+        if self.status == "FOUND":
+            task=asyncio.get_task("bluetooth")
+            print (task)
+            #exit(0)
+        # self.client.disconnect()
+        # cancelling all tasks effectively ends the program
         
 
     async def main_loop(self):
@@ -134,11 +217,24 @@ class MyFrame(wx.Frame):
             if data is not None:
                 print("received:", decode_value(data))
                 selecteur,value=decode_value(data)
-                self.mesure_label.SetLabel("Selecteur: "+selecteur)
+                
+                #chnagement de selecteur
                 if selecteur != self.selecteur:
-                    self.selecteur = selecteur
-                    parle (selecteur)
+                    if selecteur == self.selecteur_transitoire:
+                        #on a une
+                        selecteur_transitoire_count -= 1
+                        if selecteur_transitoire_count == 0:
+                            #c'ets valide on a un nouveau selecteur
+                            self.mesure_label.SetLabel("Selecteur: "+selecteur)
+                            self.selecteur = selecteur
+                            parle (selecteur)
+                    else:
+                        #nouvelle prpospition de selcteur
+                        self.selecteur_transitoire = selecteur
+                        selecteur_transitoire_count = const_selecteur_decompte
+                    
                 self.mesure_valeur.SetLabel(value)
+                self.value = value
              
               
         #wait for connexion
@@ -146,31 +242,45 @@ class MyFrame(wx.Frame):
             self.device = None
             self.mesure_valeur.SetLabel("Connecting")
             parle ("En attente de connexion")
+            self.status="DISCON"
+            self.statusbar.SetStatusText("En attente de connexion...",0)
             while self.device is None:
                 #self.mesure_valeur.AppendText(".")
                 #self.device = await BleakScanner.find_device_by_filter(filter_bluetooth_device)
                 self.device = await BleakScanner.find_device_by_name(MODEL_NAME)
 
             #Device connected
-            self.mesure_valeur.SetLabel("Connected")
-            parle ("Connecté")
+            self.mesure_valeur.SetLabel("Client trouvé")
+            parle("Multimètre trouvé")
+            self.statusbar.SetStatusText("Multimètre détecté",0)
             print ('device found')
-            time.sleep(2)
+            self.status="FOUND"
+            self.status_timer = 0
             
             # Waiting for data loop
-            async with BleakClient(self.device, disconnected_callback=handle_disconnect) as client:
-                self.mesure_valeur.SetLabel("En attente de données")
-                parle("En attente de données")
-                #print ('start notify')
-                #wxasync.AsyncBind(wx.EVT_CLOSE, on_close)
-                await client.start_notify(CHAR_NBR_UUID, handle_rx)
-                self.connected = await client.is_connected()
-                while self.connected:
-                    await asyncio.sleep(5.0)
+            try:
+                async with BleakClient(self.device, disconnected_callback=handle_disconnect) as client:
+                    self.mesure_valeur.SetLabel("En attente de données")
+                    parle("En attente de données")
+                    self.status="CONN"
+                    self.closure_request = False
+                    #print ('start notify')
+                    #wxasync.AsyncBind(wx.EVT_CLOSE, on_close)
+                    await client.start_notify(CHAR_NBR_UUID, handle_rx)
                     self.connected = await client.is_connected()
-                    #await client.stop_notify(CHAR_NBR_UUID)
-                    #print ('end notify')
-                    
+                    while self.connected and not self.closure_request:
+                        await asyncio.sleep(1.0)
+                        self.connected = await client.is_connected()
+                        #await client.stop_notify(CHAR_NBR_UUID)
+                        #print ('end notify')
+            except:
+                print ("Exception raised .....")
+                
+            #closure of application was requeted
+            if self.closure_request:
+                print ('end of application')
+                quit(0)
+                
             parle("Multimètre déconnecté   ")                    
             print ('sortie de boucle')
             
