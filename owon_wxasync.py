@@ -46,8 +46,9 @@ dict = {"25": ("milli Volts DC",10),
         "89": ("milli Volts AC",10),
         "35": ("Volts DC",1000),
         "33": ("Ohm",10),
-        "55": ("Ohm",10),
-        "41": ("Kilo Ohm",10),
+        "55": ("Circuit ouvert",10),
+        "50": ("Mega Ohm",10),
+        "43": ("Kilo Ohm",10),
         "51": ("Mega Ohm",1000),
         "74": ("nanoFarad",10),
         "163": ("Hertz",10),
@@ -58,7 +59,9 @@ dict = {"25": ("milli Volts DC",10),
         "154": ("milli Ampere DC",100),
         "218": ("milli Ampere AC",100),
         "162": ("Ampère DC",100),
-        "226": ("Ampère AC",100)}
+        "226": ("Ampère AC",100),
+        "225": ("Continuité",100),
+        "231": ("Continuité",100),}
 
 const_selecteur_decompte=3
 """
