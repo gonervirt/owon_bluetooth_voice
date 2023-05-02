@@ -138,7 +138,10 @@ class MyFrame(wx.Frame):
             parle (status_dict[self.status])
             print ('F4')
         if key == wx.WXK_F5:
-            parle (str(self.value)+" "+self.selecteur)
+            #parle (str(self.value)+" "+self.selecteur)
+            parle (str(self.value))
+            #print(f"....................{str(self.value)}")
+            #parle ("coucou")
             
     #waiting for key stroke
     def on_timer (self, event):
@@ -222,8 +225,8 @@ class MyFrame(wx.Frame):
                 if selecteur != self.selecteur:
                     if selecteur == self.selecteur_transitoire:
                         #on a une
-                        selecteur_transitoire_count -= 1
-                        if selecteur_transitoire_count == 0:
+                        self.selecteur_transitoire_count -= 1
+                        if self.selecteur_transitoire_count == 0:
                             #c'ets valide on a un nouveau selecteur
                             self.mesure_label.SetLabel("Selecteur: "+selecteur)
                             self.selecteur = selecteur
@@ -231,7 +234,7 @@ class MyFrame(wx.Frame):
                     else:
                         #nouvelle prpospition de selcteur
                         self.selecteur_transitoire = selecteur
-                        selecteur_transitoire_count = const_selecteur_decompte
+                        self.selecteur_transitoire_count = const_selecteur_decompte
                     
                 self.mesure_valeur.SetLabel(value)
                 self.value = value
