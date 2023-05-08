@@ -106,7 +106,8 @@ class MyFrame(wx.Frame):
         
          #add binding event
         self.Bind (wx.EVT_CLOSE, self.on_close)
-        self.Bind (wx.EVT_CHAR_HOOK, self.on_key)
+        #self.Bind (wx.EVT_CHAR_HOOK, self.on_key)
+        self.Bind (wx.EVT_KEY_DOWN, self.on_key)
         
         #timer
         self.timer = wx.Timer (self)
@@ -129,6 +130,7 @@ class MyFrame(wx.Frame):
     #waiting for key stroke
     def on_key (self, event):
         key = event.GetKeyCode()
+        print (key)
         if key == wx.WXK_RETURN:
             print ('return')
         if key == wx.WXK_DELETE:
@@ -145,6 +147,8 @@ class MyFrame(wx.Frame):
             parle (str(self.value))
             #print(f"....................{str(self.value)}")
             #parle ("coucou")
+        event.Skip()
+        
             
     #waiting for key stroke
     def on_timer (self, event):

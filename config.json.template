@@ -1,0 +1,17 @@
+{
+    "windows_width": 1000,
+    "windows_height": 600,
+    "color_foreground": [
+        255,
+        255,
+        0
+    ],
+    "color_background": [
+        0,
+        0,
+        0
+    ],
+    "font": "Consolas",
+    "font_size": 90,
+    "const_selecteur_decompte": 3
+}
