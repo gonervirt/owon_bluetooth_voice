@@ -34,6 +34,7 @@ MODEL_NAME="BDM"
 MODEL_ADDR="A6:C0:80:90:2D:DB"
 CHAR_NBR_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
 
+#configuration dictionary
 config_default  = {"windows_width": 1000,
           "windows_height": 600,
           "color_foreground":(255,255,0),
@@ -61,6 +62,10 @@ status_dict = {"DISCON":"en attente de connexion",
     }
 
 def load_config (config_default):
+    """Loading application configuation json file in dictionary
+
+    :param config_default: a dictionary containing default value to use incase there is missing parameter in config file
+    """
     config=config_default.copy()
     try:
         with open('config.json') as json_file:
@@ -72,9 +77,17 @@ def load_config (config_default):
     return config
 
 def parle (chaine):
+    """text to speach, the string text provides the text
+
+    :param chaine: string text
+    """
     engine.say(chaine)
     engine.runAndWait()
 
+
+#dictinnary containg all type send by Owon.
+    #Text to display and to speach when this type is selected,
+    #parameter to match the value send by OWON to exact value read on Owon
 dict = {"25": ("milli Volts DC",10),
         "89": ("milli Volts AC",10),
         "35": ("Volts DC",1000),
@@ -98,7 +111,13 @@ dict = {"25": ("milli Volts DC",10),
 
 
 class MyFrame(wx.Frame):
+    """Class defining the appli frame
+
+    :param inherit wx.Frame
+    """
     def __init__(self):
+        """Class constructor
+        """
         super().__init__(None, title='Talky Multimeter', size=(config["windows_width"], config["windows_height"]))
         
         #cree la fenetre au centre de l'ecran
@@ -151,6 +170,10 @@ class MyFrame(wx.Frame):
     
     #waiting for key stroke
     def on_key (self, event):
+        """on key event to capture key stroke
+
+        :param Standard
+        """
         key = event.GetKeyCode()
         if key == wx.WXK_F10:
             for task in asyncio.all_tasks():
@@ -166,8 +189,14 @@ class MyFrame(wx.Frame):
         event.Skip()
         
             
-    #waiting for key stroke
+    #waiting for timer event
     def on_timer (self, event):
+        """timer event handling (each second, to detect connection issue to owon
+            workaround to async with BleakClient(self.device, disconnected_callback=handle_disconnect) as client: function
+            that is sometime blocking... waitong better fix..
+
+        :param Standard
+        """
         if self.status == "FOUND":
             #print (bluetooth_task)
             #for task in asyncio.all_tasks():
@@ -183,6 +212,10 @@ class MyFrame(wx.Frame):
     
     #Windows closing handler
     def on_close(self, event):
+        """Catch frame close event, to force bluetooth disconnection and avoid waiting for Owon timeout 
+
+        :param Standard
+        """
         #asyncio.create_task(self.client.disconnect())
         #event.Skip()
         print("on close event called")
@@ -200,13 +233,25 @@ class MyFrame(wx.Frame):
         
 
     async def main_loop(self):
+        """main waiting event loop 
+
+        :param Standard
+        """
        
         #Disconnect Handler
         async def handle_disconnect(_: BleakClient):
+            """handle bluetooth disconnect -> do nothing can be removed, except logging prupose.
+
+            :param Standard
+            """
             print("Device was disconnected, goodbye.")
 
             
         def decode_value (data: bytearray):
+            """decode data byte array send by Owon, according to type and factor value (see dict dictionnary)
+
+            :param data: data byte array received from Owon 
+            """
             print(f"{data[0]}",f"{data[1]}",f"{data[2]}",f"{data[3]}",f"{data[4]}",f"{data[5]}")
             
             selecteur,facteur=dict[str(data[0])]
@@ -221,6 +266,10 @@ class MyFrame(wx.Frame):
     
         #Receiving data from Bluetooth Handler
         def handle_rx(_: BleakGATTCharacteristic, data: bytearray):
+            """data receive handler from OWON, ready to be decoded
+
+            :param data: data byte array received from Owon
+            """
             #print("received:", data.decode())
             #self.mesure_label.SetLabel("Selecteur: Volts")
             #self.mesure_valeur.SetLabel(data.decode())
@@ -248,6 +297,7 @@ class MyFrame(wx.Frame):
              
               
         #wait for connexion
+        # Working loop, managing OWON connection and disconnexion
         while True:
             self.device = None
             self.mesure_valeur.SetLabel("Connecting")
