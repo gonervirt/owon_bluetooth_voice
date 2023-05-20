@@ -1,0 +1,4 @@
+bleak==0.20.2
+pyttsx3==2.90
+wxasync==0.48
+wxPython==4.2.0
