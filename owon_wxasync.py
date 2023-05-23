@@ -147,8 +147,8 @@ class MyFrame(wx.Frame):
         
          #add binding event
         self.Bind (wx.EVT_CLOSE, self.on_close)
-        #self.Bind (wx.EVT_CHAR_HOOK, self.on_key)
-        self.Bind (wx.EVT_KEY_DOWN, self.on_key)
+        self.Bind (wx.EVT_CHAR_HOOK, self.on_key)
+        #self.Bind (wx.EVT_KEY_DOWN, self.on_key)
         
         #timer
         self.timer = wx.Timer (self)
@@ -290,7 +290,7 @@ class MyFrame(wx.Frame):
                     else:
                         #nouvelle prpospition de selcteur
                         self.selecteur_transitoire = selecteur
-                        self.selecteur_transitoire_count = config[const_selecteur_decompte]
+                        self.selecteur_transitoire_count = config["const_selecteur_decompte"]
                     
                 self.mesure_valeur.SetLabel(value)
                 self.value = value
