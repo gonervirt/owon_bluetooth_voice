@@ -25,7 +25,7 @@ folowing modules are used :
 * asyncio : async managment 
 
 ## License 
-this tool is developed under CECIL license. 
+this tool is developed under CC by SA-NC license. 
 it is free and open source.
 any modification of the code have to be published in the same terms.
  
