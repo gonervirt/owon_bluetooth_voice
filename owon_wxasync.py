@@ -28,6 +28,7 @@ from bleak.backends.scanner import AdvertisementData
 import time
 import pyttsx3
 import json
+from owon_16_data_structure_class import Owon_MultimeterData
 
 #OWON 16
 MODEL_NAME="BDM"
@@ -246,8 +247,19 @@ class MyFrame(wx.Frame):
             """
             print("Device was disconnected, goodbye.")
 
-            
+
         def decode_value (data: bytearray):
+            """decode data byte array send by Owon, according to type and factor value (see dict dictionnary)
+
+            :param data: data byte array received from Owon 
+            """
+            decoded_data = Owon_MultimeterData (data)
+            print(decoded_data)
+            return (f"{decoded_data.unit_name()}", f"{decoded_data.value()} {decoded_data.unit()}")
+
+
+
+        def decode_value_1 (data: bytearray):
             """decode data byte array send by Owon, according to type and factor value (see dict dictionnary)
 
             :param data: data byte array received from Owon 
