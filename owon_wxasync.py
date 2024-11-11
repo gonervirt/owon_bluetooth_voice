@@ -255,7 +255,7 @@ class MyFrame(wx.Frame):
             """
             decoded_data = Owon_MultimeterData (data)
             print(decoded_data)
-            return (f"{decoded_data.unit_name()}", f"{decoded_data.value()} {decoded_data.unit()}")
+            return (f"{decoded_data.unit_name()}", f"{decoded_data.value()} {decoded_data.unit_name()}")
 
 
 

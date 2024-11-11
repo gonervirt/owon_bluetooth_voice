@@ -140,9 +140,6 @@ class Owon_MultimeterData:
     def value(self):
         return self.value
     
-    def unit(self):
-        return self.unit
-    
     def unit_name(self):
         return self.unit_name
 
