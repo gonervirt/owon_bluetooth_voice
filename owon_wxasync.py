@@ -29,6 +29,7 @@ import time
 import pyttsx3
 import json
 from owon_16_data_structure_class import Owon_MultimeterData
+import binascii
 
 #OWON 16
 MODEL_NAME="BDM"
@@ -255,7 +256,11 @@ class MyFrame(wx.Frame):
             """
             decoded_data = Owon_MultimeterData (data)
             print(decoded_data)
-            return (f"{decoded_data.unit_name()}", f"{decoded_data.value()} {decoded_data.unit_name()}")
+            unit=str(decoded_data.unit_name)
+            value=str(decoded_data.value)
+            print(unit, value)
+            #return (f'{decoded_data.unit_name()}', f'{decoded_data.value()} {decoded_data.unit_name()}')
+            return (unit, f'{value} {unit}')
 
 
 
